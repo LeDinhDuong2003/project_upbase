@@ -1,0 +1,7 @@
+type Query {
+    comments: [Comment!]! @all
+}
+
+type Mutation {
+    createComment(user_id: ID!, post_id: ID!, content: String!): Comment! @create
+}

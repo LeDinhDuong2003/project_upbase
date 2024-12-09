@@ -1,0 +1,145 @@
+extend type Query {
+    dimReportDateOption(sme_id: Int!): DimReportDateOptionOutput
+
+    getFactPlanReportTemplate(
+        sme_id: Int!
+        store_id: Int!
+        year: Int!
+        month: Int!
+    ): GetFactPlanReportTemplateOutput
+
+    getFactPlanReport(
+        sme_id: Int!
+        store_id: Int!
+        fact_plan_report_id: Int!
+    ): GetFactPlanReportOutput
+}
+extend type Mutation {
+    importFactPlanReport(
+        sme_id: Int! @rules(apply: ["integer", "required"])
+        store_id: Int! @rules(apply: ["integer", "required"])
+        dim_report_date_id: Int! @rules(apply: ["integer", "required"])
+        file_url: String!
+    ): ImportFactPlanReportOutput
+
+    upSetFactPlanReport(
+        sme_id: Int! @rules(apply: ["integer", "required"])
+        store_id: Int! @rules(apply: ["integer", "required"])
+        dim_report_date_id: Int! @rules(apply: ["integer", "required"])
+        code: String!
+        report_type: String! @rules(apply: [ "required","string","in:plan,result"])
+        value: Float
+    ): UpSetFactPlanReportOutput
+
+    vrExportFactPlanReport(
+        sme_id: Int!
+        store_id: Int!
+        fact_plan_report_id: Int!
+    ): ExportOutput
+
+    vrUpsertFactPlanReportManual(
+        sme_id: Int!
+        store_id: Int!
+        fields: [VrFieldManualInput!]!
+    ): VrUpSertFactPlanReportManualOutput
+}
+
+input VrFieldManualInput {
+    code: String!
+    value: Float
+    dim_report_date_id: Int!
+}
+type VrUpSertFactPlanReportManualOutput {
+    success: Int!
+    message: String
+    list_error: [VrListError]
+}
+type VrListError {
+    code: String
+    error_msg: String
+}
+
+type UpSetFactPlanReportOutput {
+    success: Int!
+    message: String
+}
+type ImportFactPlanReportOutput {
+    success: Int!
+    message: String
+    total: Int
+    total_error: Int
+    total_success: Int
+    list_error: [VrListError]
+}
+
+type GetFactPlanReportOutput {
+    success: Int!
+    message: String
+    group_fields: [GroupField!]
+    group_month_fields: [GroupMonthField!]
+    group_week_fields: [GroupWeekField!]
+    field_manual: [String!]
+    field_dynamic: [String!]
+    field_static: [String!]
+}
+
+type GroupField {
+    group_name: String
+    last_updated_at: String
+    fields: [Field!]
+}
+
+type Field {
+    code: String!
+    name: String!
+}
+
+type GroupMonthField{
+    dim_report_date_id: Int
+    name: String
+    code: String
+    from_date: String
+    to_date: String
+    last_updated_at: String
+    plan: Float
+    result: Float
+    gap: Float
+}
+
+type GroupWeekField{
+    dim_report_date_id: Int
+    from_date: String
+    to_date: String
+    name: String
+    last_updated_at: String
+    week_fields: [WeekField!]
+}
+
+type WeekField{
+    dim_report_date_id: Int
+    name: String
+    code: String
+    plan: Float
+    result: Float
+    gap: Float
+    from_date: String
+    to_date: String
+}
+
+type DimReportDateOptionOutput {
+    success: Int!
+    message: String
+    options: [DimReportOption!]
+}
+
+type DimReportOption {
+    id: Int!
+    year: Int!
+    month: Int!
+}
+
+type GetFactPlanReportTemplateOutput {
+    success: Int!
+    message: String
+    link: String
+}

@@ -1,0 +1,17 @@
+type Query {
+    userForName(id:ID! @eq,name: String! @eq) : User! @find
+    user(id: ID!): User
+        @field(resolver: "App\\GraphQL\\Queries\\UserQuery@__invoke")
+    users: [User!]!  @paginate
+}
+
+type Mutation {
+    createUser(
+        name: String!
+        email: String! @validate(email: true)
+        password: String! @validate(min: 8)
+        role: String!
+    ): User! @create
+    deleteSoftUser(id: ID! @whereKey): User @delete
+    deleteUser(id: ID! @whereKey): User @forceDelete
+}

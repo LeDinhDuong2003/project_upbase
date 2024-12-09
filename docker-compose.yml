@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # Dịch vụ web Laravel
+  web:
+    build: .
+    container_name: laravel_app
+    image: yourdockerhubuser/laravel_app:latest  # Image đã push lên Docker Hub
+    ports:
+      - "8000:80"  # Lắng nghe cổng 80 trong container, truy cập qua cổng 8000 trên host
+    volumes:
+      - .:/var/www/html  # Mount code từ máy chủ vào container
+    networks:
+      - app-network
+    depends_on:
+      - db
+    command: apache2-foreground
+
+  # Dịch vụ PostgreSQL
+  db:
+    image: postgres:13
+    container_name: laravel_db
+    environment:
+      POSTGRES_DB: upbase
+      POSTGRES_USER: default
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"  # Cổng kết nối với PostgreSQL
+    networks:
+      - app-network
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  # Dịch vụ pgAdmin
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com  # Email mặc định để đăng nhập vào pgAdmin
+      PGADMIN_DEFAULT_PASSWORD: admin         # Mật khẩu cho email đăng nhập
+    ports:
+      - "5050:80"  # Truy cập pgAdmin qua cổng 5050 trên host
+    networks:
+      - app-network
+    depends_on:
+      - db
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin  # Lưu trữ dữ liệu pgAdmin
+
+# Mạng nội bộ cho các dịch vụ
+networks:
+  app-network:
+    driver: bridge
+
+# Dữ liệu cho PostgreSQL và pgAdmin
+volumes:
+  db-data:
+  pgadmin-data:

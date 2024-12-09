@@ -1,0 +1,15 @@
+type Query {
+    post(id: ID! @eq): Post @find
+    posts(
+        where: 
+            _@whereConditions(
+                columns: [ "user_id", "created_at", "title", "content" ]
+            )
+    ): [Post!]! @all
+}
+
+type Mutation {
+    createPost(user_id: ID!, title: String!, content: String!): Post! @create
+    deleteSoftPost(id: ID! @whereKey): Post @delete
+    restorePost(id: ID! @whereKey): Post @restore
+}
